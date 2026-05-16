@@ -30,9 +30,15 @@ void SeekDriver::run()
     head.seq = frameCount_;
     head.stamp = ros::Time::now();
 
-    //publish display image
+    //publish display image using a blue-cold/yellow-hot thermal colormap
+    cv::Mat normalizedTemperatureImage;
+    cv::Mat colorizedTemperatureImage;
+    cv::normalize(temperatureImageMatrix_, normalizedTemperatureImage,
+      0, 255, cv::NORM_MINMAX, CV_8UC1);
+    cv::applyColorMap(normalizedTemperatureImage, colorizedTemperatureImage,
+      cv::COLORMAP_PLASMA);
     sensor_msgs::ImagePtr displayMsg = cv_bridge::CvImage(head,
-      "bgra8", displayImageMatrix_).toImageMsg();
+      "bgr8", colorizedTemperatureImage).toImageMsg();
     displayImagePub_.publish(displayMsg);
 
     //publish thermography image
@@ -126,7 +132,8 @@ bool SeekDriver::initCamera()
     return false;
   }
 
-  //Setting lookup table for gain controlled display image
+  //Setting lookup table for gain controlled display image returned by the SDK.
+  //The ROS display topic is colorized from thermography data in run().
   mostRecentReturn = Seekware_SetSetting(tempCamera, SETTING_ACTIVE_LUT, SW_LUT_WHITE_NEW);
   isErr = checkForError(mostRecentReturn, "Setting LUT");
   if (isErr) {
