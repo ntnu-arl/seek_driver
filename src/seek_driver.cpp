@@ -33,8 +33,9 @@ void SeekDriver::run()
     //publish display image using a blue-cold/yellow-hot thermal colormap
     cv::Mat normalizedTemperatureImage;
     cv::Mat colorizedTemperatureImage;
-    cv::normalize(temperatureImageMatrix_, normalizedTemperatureImage,
-      0, 255, cv::NORM_MINMAX, CV_8UC1);
+    temperatureImageMatrix_.convertTo(normalizedTemperatureImage, CV_8UC1,
+      255.0 / (maxTemp_ - minTemp_),
+      -minTemp_ * 255.0 / (maxTemp_ - minTemp_));
     cv::applyColorMap(normalizedTemperatureImage, colorizedTemperatureImage,
       cv::COLORMAP_PLASMA);
     sensor_msgs::ImagePtr displayMsg = cv_bridge::CvImage(head,
@@ -205,6 +206,8 @@ void SeekDriver::initRos()
 {
   //default doesn't need to be over 9.0 since that is camera frame rate
   private_nh_.param<double>("timerFreq_", timerFreq_, 9.0);  // Hz
+  private_nh_.param<float>("min_temp", minTemp_, 20.0f);
+  private_nh_.param<float>("max_temp", maxTemp_, 30.0f);
 
   // set subscriber
 

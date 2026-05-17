@@ -86,6 +86,9 @@ private:
 
   int frameCount_ = 0;
 
+  float minTemp_;
+  float maxTemp_;
+
   /**
    * Display Data returned from Seek is noted as ARGB888
    * in the Seek SDK. The encoding for CV_8UC4 (8 bit, 4 channel)

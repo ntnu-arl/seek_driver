@@ -1,5 +1,6 @@
 <launch>
     <node pkg="seek_driver" type="seek_driver" name="seek_driver">
+  <rosparam file="$(find seek_driver)/config/config.yaml" command="load"/>
     </node>
     <!-- Uncomment below to activate seek_listener node -->
     <!-- <node pkg="seek_listener" type="seek_listener" name="seek_listener">
